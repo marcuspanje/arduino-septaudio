@@ -1,19 +1,16 @@
+
 const int ledpin = 13;
 const int T = 400;
 
 volatile int thigh = 200;
-volatile int tlow = 200;
-
 volatile int state = 0;
-volatile int pwmcount = 0;
-int pwmcount0 = 0;
-
 volatile int a = 0;
 
 volatile int finished_T = 0;
 volatile int count = 0;
-const int nvals = 4;
-int vals[nvals] = {200, 120, 200, 120};
+int vals[4] = {200, 120, 200, 120};
+const int sz = sizeof(vals)/sizeof(int);
+const int sz_1 = sz - 1;
 
 void setup()
 {
@@ -34,31 +31,16 @@ void setup()
 ISR(TIMER1_COMPA_vect) { 
 
   if (state) {     
+    OCR1A += T - thigh;
     PORTB &= B000000; //pin13 = LOW
-
-//    OCR1A += T - thigh;
-    OCR1A += tlow;
-    state = 0;
-    /*
-    if (tlow < 100) {
-      while (TCNT < OCR1A) ;
-      PORTB |= B100000;
-      OCR1A += thigh;
-    }
-    else {
-      state = 0;
-    }
-    */
-
-    pwmcount++;
-//    finished_T |= 1;
+    state &= 0;
+    finished_T |= 1;
   }
   
   else {  
-    PORTB |= B100000; // pin13 = HiGH     
-
     OCR1A += thigh; 
-    state = 1; 
+    PORTB |= B100000; // pin13 = HiGH     
+    state |= 1; 
   }
   
 }
@@ -66,18 +48,14 @@ ISR(TIMER1_COMPA_vect) {
 void loop()
 {
   
-//  if (finished_T) { //get new thigh
-  if (pwmcount > pwmcount0) {
-    pwmcount0 = pwmcount;
-//       thigh = vals[count];
-    thigh = vals[pwmcount0 % nvals];
-    tlow = T - thigh;
-    
-    /*
+   if (finished_T) { //get new thigh
+       thigh = vals[count];
        if (count == sz_1) count = 0;
        else count++;
        finished_T &= 0;
-     */
    }
+     
+         
+     
   
 }
