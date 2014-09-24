@@ -1,5 +1,5 @@
 const int TOP = 400;
-float input_TOP = 1024.0;
+float input_TOP = 1024;
 float input_BOTTOM = 0;
 float scale = TOP/input_TOP;
 
@@ -29,9 +29,13 @@ void setup()
   ADMUX = _BV(REFS0);
   ADCSRA |= _BV(ADPS2) | _BV(ADPS0);
   ADCSRA |= _BV(ADEN); //turn on adc
+  
+  //configure Timer 0 for GP counting
+  TCCR0A = 0;//normal mode. TCNT0 just increments
+  TCCR0B = 0;
+  TCCR0B |= _BV(CS00);//clk=16MHz;
   sei();
   
-   
 }
 
 void loop()
@@ -40,8 +44,6 @@ void loop()
   ADCSRA |= _BV(ADSC);//start ADC
   int low = ADCL;
   int high = ADCH; 
-  int adc = (high << 8) | low;
-  //Serial.println(adc); 
+  int adc = (high << 8) | low; 
   OCR1B = (int) adc*scale;
- 
 }
