@@ -3,6 +3,10 @@ float input_TOP = 1024;
 float input_BOTTOM = 0;
 float scale = TOP/input_TOP;
 
+const int len = 4;
+int signal[len] = {100, 200, 300, 200};  
+unsigned int i = 0;
+
 void setup()
 {
   Serial.begin(9600);
@@ -18,7 +22,9 @@ void setup()
   TCCR1A = _BV(COM1B1) | _BV(COM1B0) | _BV(WGM11) | _BV(WGM10); 
   TCCR1B = _BV(WGM13) | _BV(WGM12) | _BV(CS10);
   OCR1A = TOP;
-  OCR1B = 200;
+  OCR1B = 100;
+  
+  TIMSK1 |= _BV(OCIE1A);
   
   //configure ADC on analog input
   DDRC = 0;//pin0 is input
@@ -38,12 +44,25 @@ void setup()
   
 }
 
-void loop()
+ISR(TIMER1_COMPA_vect) 
 {
-  //read input
+  OCR1B = signal[i % len];
+  i++;
+}
+
+void sample_input()
+{
   ADCSRA |= _BV(ADSC);//start ADC
   int low = ADCL;
   int high = ADCH; 
   int adc = (high << 8) | low; 
   OCR1B = (int) adc*scale;
+}
+
+
+void loop()
+{
+  //sample_input();
+  
+  
 }
