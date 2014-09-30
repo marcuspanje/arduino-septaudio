@@ -3,9 +3,28 @@ float input_TOP = 1024;
 float input_BOTTOM = 0;
 float scale = TOP/input_TOP;
 
-const int len = 4;
-int signal[len] = {100, 200, 300, 200};  
+const int len = 8;
+int signal[len] = {50, 150, 250, 350, 450, 350, 250, 150};  
 unsigned int i = 0;
+
+void setup_timer0() //timer to iterate through sequence of values
+{
+  TCCR0A = 0;//normal mode. TCNT0 just increments
+  TCCR0B = 0;
+  TCCR0B |= _BV(CS00);//clk=16MHz; 
+}
+
+void setup_ADC() //configure ADC on analog input
+{
+  DDRC = 0;//pin0 is input
+//MUX(3:0)=0000 ADC0(pin0) input; REFS(1:0)=01 Vref=Vcc(5V). 
+//ADPS(2:0)=101 ADCclk=16MHz/32=500kHz. Conversion takes 13 tcks of ADCclk 
+  ADMUX = 0;
+  ADCSRA = 0;
+  ADMUX = _BV(REFS0);
+  ADCSRA |= _BV(ADPS2) | _BV(ADPS0);
+  ADCSRA |= _BV(ADEN); //turn on adc
+}
 
 void setup()
 {
@@ -26,25 +45,14 @@ void setup()
   
   TIMSK1 |= _BV(OCIE1A);
   
-  //configure ADC on analog input
-  DDRC = 0;//pin0 is input
-//MUX(3:0)=0000 ADC0(pin0) input; REFS(1:0)=01 Vref=Vcc(5V). 
-//ADPS(2:0)=101 ADCclk=16MHz/32=500kHz. Conversion takes 13 tcks of ADCclk 
-  ADMUX = 0;
-  ADCSRA = 0;
-  ADMUX = _BV(REFS0);
-  ADCSRA |= _BV(ADPS2) | _BV(ADPS0);
-  ADCSRA |= _BV(ADEN); //turn on adc
+  setup_ADC();//sample analog input on pin0
+  //setup_timer0();//access array of values to generate tone
   
-  //configure Timer 0 for GP counting
-  TCCR0A = 0;//normal mode. TCNT0 just increments
-  TCCR0B = 0;
-  TCCR0B |= _BV(CS00);//clk=16MHz;
   sei();
   
 }
 
-ISR(TIMER1_COMPA_vect) 
+ISR(TIMER1_COMPA_vect) //iterate through sequence of values 
 {
   OCR1B = signal[i % len];
   i++;
@@ -59,10 +67,13 @@ void sample_input()
   OCR1B = (int) adc*scale;
 }
 
-
 void loop()
 {
   //sample_input();
-  
+   ADCSRA |= _BV(ADSC);//start ADC
+  int low = ADCL;
+  int high = ADCH; 
+  int adc = (high << 8) | low; 
+  OCR1B = (int) adc*scale;
   
 }
