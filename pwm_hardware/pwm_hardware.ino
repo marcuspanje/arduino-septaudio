@@ -3,8 +3,13 @@ float input_TOP = 1024;
 float input_BOTTOM = 0;
 float scale = TOP/input_TOP;
 
-const int len = 8;
-int signal[len] = {50, 150, 250, 350, 450, 350, 250, 150};  
+const int len = 2;
+/*int signal[len] = //1kHz tone, len = 40
+{200, 171, 150, 171, 150, 114, 100, 114, 100, 114, 100, 114, 100, 
+114, 100, 114, 150, 171, 200, 229, 200, 229, 250, 286, 300, 343, 300, 
+343, 300, 343, 300, 343, 300, 343, 300, 286, 250, 286, 250, 229};
+*/
+int signal[len] = {229, 200};
 unsigned int i = 0;
 
 void setup_timer0() //timer to iterate through sequence of values
@@ -45,8 +50,8 @@ void setup()
   
   TIMSK1 |= _BV(OCIE1A);
   
-  setup_ADC();//sample analog input on pin0
-  //setup_timer0();//access array of values to generate tone
+  //setup_ADC();//sample analog input on pin0
+  setup_timer0();//access array of values to generate tone
   
   sei();
   
@@ -70,10 +75,5 @@ void sample_input()
 void loop()
 {
   //sample_input();
-   ADCSRA |= _BV(ADSC);//start ADC
-  int low = ADCL;
-  int high = ADCH; 
-  int adc = (high << 8) | low; 
-  OCR1B = (int) adc*scale;
   
 }
