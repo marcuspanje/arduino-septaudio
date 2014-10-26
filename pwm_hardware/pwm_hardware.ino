@@ -1462,6 +1462,7 @@ void setup()
   //Serial.begin(9600);
   cli();
   DDRB = B100; //pin10 is output
+  DDRD = DDRD & ~B100; //pin2 is input
   
 //configure timers for pwm generation
   TCCR1A = 0;
@@ -1485,6 +1486,13 @@ void setup()
 
 ISR(TIMER1_COMPA_vect) //iterate through sequence of values 
 {
+   //check enable pin
+   if (PIND & B100) {
+     DDRB = B100;
+   } else {
+     DDRB = 0;
+   }
+  
    //read data from program memory 
    OCR1B = pgm_read_word_near((i%len) + signal);
    i++;
