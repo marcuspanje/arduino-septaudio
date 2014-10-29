@@ -1487,12 +1487,12 @@ void setup()
 ISR(TIMER1_COMPA_vect) //iterate through sequence of values 
 {
    //check enable pin
-   if (PIND & B100) {
+  /* if (PIND & B100) {
      DDRB = B100;
    } else {
      DDRB = 0;
    }
-  
+  */
    //read data from program memory 
    OCR1B = pgm_read_word_near((i%len) + signal);
    i++;
