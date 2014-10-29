@@ -10,7 +10,7 @@ unsigned int i = 0;
 void setup_timer0() //timer to iterate through sequence of values
 {
   TCCR0A = 0;//normal mode. TCNT0 just increments
-  TCCR0B = 0;q
+  TCCR0B = 0;
   TCCR0B |= _BV(CS00);//clk=16MHz; 
 }
 
