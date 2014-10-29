@@ -5,7 +5,6 @@ float input_TOP = 1024.0;
 //float input_BOTTOM = 0;
 float scale = TOP/input_TOP;
 
-unsigned int i = 0;
 
 void setup_timer0() //timer to iterate through sequence of values
 {
@@ -14,9 +13,11 @@ void setup_timer0() //timer to iterate through sequence of values
   TCCR0B |= _BV(CS00);//clk=16MHz; 
 }
 
+
+
 void setup_ADC() //configure ADC on analog input
 {
-  DDRC = 0;//pin0 is input
+  DDRC = 0;//pin0 is input for sampling
 //MUX(3:0)=0000 ADC0(pin0) input; REFS(1:0)=01 Vref=Vcc(5V). 
 //ADPS(2:0)=101 ADCclk=16MHz/32=500kHz. Conversion takes 13 tcks of ADCclk 
   ADMUX = 0;
@@ -31,7 +32,7 @@ void setup()
   //Serial.begin(9600);
   cli();
   DDRB = B100; //pin10 is output
-  DDRD = DDRD & ~B100; //pin2 is input
+  //DDRD = DDRD & ~B100; //pin2 is enable input
   
 //configure timers for pwm generation
   TCCR1A = 0;
@@ -48,8 +49,7 @@ void setup()
   
   setup_ADC();//sample analog input on pin0
  
-  sei();
-  
+  sei(); 
 }
 
 
