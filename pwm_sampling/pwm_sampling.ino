@@ -6,15 +6,6 @@ float input_TOP = 1024.0;
 float scale = TOP/input_TOP;
 
 
-void setup_timer0() //timer to iterate through sequence of values
-{
-  TCCR0A = 0;//normal mode. TCNT0 just increments
-  TCCR0B = 0;
-  TCCR0B |= _BV(CS00);//clk=16MHz; 
-}
-
-
-
 void setup_ADC() //configure ADC on analog input
 {
   DDRC = 0;//pin0 is input for sampling
@@ -29,7 +20,7 @@ void setup_ADC() //configure ADC on analog input
 
 void setup()
 {
-  //Serial.begin(9600);
+
   cli();
   DDRB = B100; //pin10 is output
   //DDRD = DDRD & ~B100; //pin2 is enable input
@@ -49,7 +40,9 @@ void setup()
   
   setup_ADC();//sample analog input on pin0
  
-  sei(); 
+  sei();
+ 
+   Serial.begin(9600); 
 }
 
 
@@ -60,9 +53,12 @@ void sample_input()
   int high = ADCH; 
   int adc = (high << 8) | low; 
   OCR1B = (int) adc*scale;
+  //Serial.println(OCR1B);
 }
 
 void loop()
 {
-  sample_input();
+  
+//  sample_input();
+  Serial.print(1);
 }
