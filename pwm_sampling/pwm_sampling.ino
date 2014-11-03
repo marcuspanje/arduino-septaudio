@@ -24,7 +24,7 @@ void setup()
   cli();
   DDRB = B100; //pin10 is output
   //DDRD = DDRD & ~B100; //pin2 is enable input
-  
+ 
 //configure timers for pwm generation
   TCCR1A = 0;
   TCCR1B = 0;
@@ -34,9 +34,7 @@ void setup()
   TCCR1A = _BV(COM1B1) | _BV(COM1B0) | _BV(WGM11) | _BV(WGM10); 
   TCCR1B = _BV(WGM13) | _BV(WGM12) | _BV(CS10);
   OCR1A = TOP;
-  OCR1B = 100;
-  
-  TIMSK1 |= _BV(OCIE1A); //enable ISR when TCNT1 reaches TOP
+  OCR1B = 0;
   
   setup_ADC();//sample analog input on pin0
  
@@ -59,6 +57,6 @@ void sample_input()
 void loop()
 {
   
-//  sample_input();
-  Serial.print(1);
+  sample_input();
+  Serial.println(OCR1B);
 }
