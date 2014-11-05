@@ -1453,6 +1453,17 @@ short int signal[len] PROGMEM =
 
 unsigned int i = 0;
 
+<<<<<<< HEAD
+=======
+void setup_timer0() //timer to iterate through sequence of values
+{
+  TCCR0A = 0;//normal mode. TCNT0 just increments
+  TCCR0B = 0;
+  TCCR0B |= _BV(CS00);//clk=16MHz; 
+}
+
+
+>>>>>>> 413633d8c9e4fab5e99b45ba6573ecc735d511f3
 void setup()
 {
   //Serial.begin(9600);
@@ -1474,7 +1485,11 @@ void setup()
   OCR1A = 400;
   OCR1B = 100;
   
+<<<<<<< HEAD
   TIMSK1 |= _BV(OCIE1A); //enable ISR(Timer1) when TCNT1 reaches TOP
+=======
+  setup_timer0();//access array of values to generate tone
+>>>>>>> 413633d8c9e4fab5e99b45ba6573ecc735d511f3
   
   sei();
   
@@ -1494,6 +1509,10 @@ ISR(TIMER1_COMPA_vect) //iterate through sequence of values
    i++;
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 413633d8c9e4fab5e99b45ba6573ecc735d511f3
 void loop()
 {
 }
