@@ -1,10 +1,23 @@
+
+
 #include <avr/pgmspace.h>
 
-const int TOP = 400;
-float input_TOP = 1024.0;
-//float input_BOTTOM = 0;
-float scale = TOP/input_TOP;
-const int len = 14193;
+/*
+output pins: 10 (PWM wave) input pins: 2 (enable outpus switch)
+
+MATLAB model PWModulates an input sound file, obtaining duty cycle
+data for each period at 40 kHz. These values are stored in Flash (32kB) if 
+PROGMEM is specified. If not, values are stored in SRAM(2kB).
+see arduino.cc/en/Tutorial/Memory
+ 
+setup() configures the internal PWM to do the following:
+timer counts from 0 to 400.
+At tick i, if counter > signal[i], output = HIGH;
+else output = LOW;
+See Fast PWM Mode in pg 101 of atmega 328 datasheet:
+www.atmel.com/Images/doc8161.pdf
+*/
+
 
 /*
 int signal[len] =  //1kHz tone, len = 40
@@ -12,8 +25,10 @@ int signal[len] =  //1kHz tone, len = 40
 114, 100, 114, 150, 171, 200, 229, 200, 229, 250, 286, 300, 343, 300, 
 343, 300, 343, 300, 343, 300, 343, 300, 286, 250, 286, 250, 229}; 
 */
+\
 
-//siren sound stored in program memory
+//siren sound
+const short int len = 14193;
 short int signal[len] PROGMEM = 
 {200, 171, 200, 171, 200, 229, 200, 229, 250, 229, 
 250, 229, 250, 286, 250, 286, 250, 286, 250, 286, 
@@ -1438,33 +1453,14 @@ short int signal[len] PROGMEM =
 
 unsigned int i = 0;
 
-void setup_timer0() //timer to iterate through sequence of values
-{
-  TCCR0A = 0;//normal mode. TCNT0 just increments
-  TCCR0B = 0;
-  TCCR0B |= _BV(CS00);//clk=16MHz; 
-}
-
-void setup_ADC() //configure ADC on analog input
-{
-  DDRC = 0;//pin0 is input
-//MUX(3:0)=0000 ADC0(pin0) input; REFS(1:0)=01 Vref=Vcc(5V). 
-//ADPS(2:0)=101 ADCclk=16MHz/32=500kHz. Conversion takes 13 tcks of ADCclk 
-  ADMUX = 0;
-  ADCSRA = 0;
-  ADMUX = _BV(REFS0);
-  ADCSRA |= _BV(ADPS2) | _BV(ADPS0);
-  ADCSRA |= _BV(ADEN); //turn on adc
-}
-
 void setup()
 {
   //Serial.begin(9600);
   cli();
-  DDRB = B100; //pin10 is output
-  DDRD = DDRD & ~B100; //pin2 is input
+  DDRB = B100; //pin10 is PWM output
+  DDRD = DDRD & ~B100; //pin2 is input (enable switch)
   
-//configure timers for pwm generation
+//configure timer1 for pwm generation
   TCCR1A = 0;
   TCCR1B = 0;
  //WGM1(3:0)=1111 fast pwm mode; CS1(2:0)=001 16Mhz clk not prescaled
@@ -1472,13 +1468,13 @@ void setup()
  //TCCR1A = B1011xx11 ; TCCR1B = B00011001
   TCCR1A = _BV(COM1B1) | _BV(COM1B0) | _BV(WGM11) | _BV(WGM10); 
   TCCR1B = _BV(WGM13) | _BV(WGM12) | _BV(CS10);
-  OCR1A = TOP;
+  
+  //TCNT counts from O to OCR1A. 
+  //if TCNT > OCR1B, output = High; else output = low;
+  OCR1A = 400;
   OCR1B = 100;
   
-  TIMSK1 |= _BV(OCIE1A); //enable ISR when TCNT1 reaches TOP
-  
-  //setup_ADC();//sample analog input on pin0
-  setup_timer0();//access array of values to generate tone
+  TIMSK1 |= _BV(OCIE1A); //enable ISR(Timer1) when TCNT1 reaches TOP
   
   sei();
   
@@ -1498,16 +1494,6 @@ ISR(TIMER1_COMPA_vect) //iterate through sequence of values
    i++;
 }
 
-void sample_input()
-{
-  ADCSRA |= _BV(ADSC);//start ADC
-  int low = ADCL;
-  int high = ADCH; 
-  int adc = (high << 8) | low; 
-  OCR1B = (int) adc*scale;
-}
-
 void loop()
 {
-  //sample_input();
 }
