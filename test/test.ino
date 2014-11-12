@@ -1,3 +1,9 @@
+#include <avr/pgmspace.h>
+
+const unsigned int len = 16350;
+short int signal1[len] PROGMEM = {};
+short int signal2[len] PROGMEM = {};
+short int signal3[len] PROGMEM = {};
 
 void setup()
 {
