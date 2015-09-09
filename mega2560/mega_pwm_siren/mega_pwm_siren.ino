@@ -19,7 +19,7 @@ www.atmel.com/Images/doc8161.pdf
 
 //siren sound
 const int len = 14193;
-short int signal[len] PROGMEM = 
+short int const signal[len] PROGMEM = 
 {200, 171, 200, 171, 200, 229, 200, 229, 250, 229, 
 250, 229, 250, 286, 250, 286, 250, 286, 250, 286, 
 250, 286, 250, 229, 250, 229, 200, 229, 200, 171, 
