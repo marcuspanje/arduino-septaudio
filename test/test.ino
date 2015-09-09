@@ -1,17 +1,22 @@
+#include <avr/pgmspace.h>
+
+const unsigned int len = 16350;
+short int signal1[len] PROGMEM = {};
+short int signal2[len] PROGMEM = {};
+short int signal3[len] PROGMEM = {};
 
 void setup()
 {
- Serial.begin(9600);
-  pinMode(13, OUTPUT);
+  Serial.begin(9600);
+  //pinMode(11, OUTPUT);
+  DDRB = B100000;;
 }
 
 void loop()
 {
- /* digitalWrite(13, HIGH);
+  PORTB = B100000;
   delay(1000);
-  digitalWrite(13, LOW);
-  delay(1000);*/
-  delay(100);
-  Serial.println("1");
-  
+  PORTB = B0;
+  delay(1000);
 }
+
